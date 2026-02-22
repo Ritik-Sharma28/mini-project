@@ -1,0 +1,101 @@
+\documentclass[11pt]{beamer}
+
+% Required for professional tables
+\usepackage{booktabs} 
+
+% Theme and Custom Modern Color
+\usetheme{Madrid}
+\definecolor{ModernBlue}{RGB}{41, 128, 185} % A clean, modern flat blue
+\usecolortheme[named=ModernBlue]{structure}
+
+% Information for Title Slide
+\title[StudyMate (Mini-Project)]{StudyMate: A Developer Collaboration Platform}
+\subtitle{Mini-Project Presentation}
+\author[Web Crew]{Group: Web Crew \\ \vspace{0.5cm} \small Ritik Sharma (2400520100061) \\ Yash Kumar (2400520100079) \\ Tavishi Jain (2400520100069)}
+\institute[]{INC - 454}
+\date{} % This command removes the default date
+
+\begin{document}
+
+% Slide 1: Title Slide
+\begin{frame}
+    \titlepage
+\end{frame}
+
+% Slide 2: Brief about the Project
+\begin{frame}{Brief about the Project}
+    \textbf{Problem:} Students and developers often struggle to find dedicated coding partners with similar skill sets and goals for projects. \\ \vspace{0.5cm}
+    \textbf{Solution:} \textit{StudyMate} is a streamlined social platform designed exclusively for developers. \\ \vspace{0.3cm}
+    \textbf{Core Features:}
+    \begin{itemize}
+        \item \textbf{Find Partner:} An algorithm to discover and connect with like-minded developers based on tech stacks.
+        \item \textbf{Community Posts:} A dedicated feed to share project updates, ask technical questions, and showcase work.
+        \item \textbf{Developer Profiles:} Customizable profiles highlighting individual skills, GitHub links, and current focuses.
+    \end{itemize}
+\end{frame}
+
+% Slide 3: Comparison with Existing Systems
+\begin{frame}{Comparison with Existing Systems}
+    \begin{table}
+        \centering
+        \renewcommand{\arraystretch}{1.6} % Adds breathing room between rows
+        \begin{tabular}{@{} p{2.5cm} p{4cm} p{4cm} @{}}
+            \toprule
+            \textbf{Feature} & \textbf{General Social Media} & \textbf{StudyMate (Our Project)} \\ 
+            \midrule
+            \textbf{Primary Focus} & Broad networking, job hunting, or general discussions. & Strict focus on finding active project/coding partners. \\ 
+            \textbf{Matchmaking} & Manual searching and cold messaging. & Tech-stack specific filtering and matching. \\ 
+            \textbf{Distractions} & High (ads, viral posts, recruiters). & Low (strictly developer and project-centric content). \\ 
+            \bottomrule
+        \end{tabular}
+    \end{table}
+\end{frame}
+
+% Slide 4: Tools Being Used
+\begin{frame}{Tools Being Used}
+    This project is being developed using the \textbf{MERN Stack} for a robust, scalable, and responsive application.
+    \vspace{0.5cm}
+    \begin{itemize}
+        \item \textbf{Frontend:} React.js (built with Vite), Tailwind CSS for rapid UI styling.
+        \item \textbf{Backend:} Node.js with Express.js for handling API routes and business logic.
+        \item \textbf{Database:} MongoDB (NoSQL) for flexible data storage of user profiles and posts.
+        \item \textbf{Authentication:} JSON Web Tokens (JWT) for secure user sessions.
+    \end{itemize}
+\end{frame}
+
+% Slide 5: Timeline of Project
+\begin{frame}{Timeline of Project (6 Weeks)}
+    \begin{itemize}
+        \item \textbf{Week 1:} Requirement analysis, UI/UX wireframing, and repository setup.
+        \item \textbf{Week 2:} Backend architecture, database schema design, and implementing User Authentication.
+        \item \textbf{Week 3:} Developing the Frontend layout and integrating the Profile Page.
+        \item \textbf{Week 4:} Building the Community Posts feature (Create, Read, integration with backend).
+        \item \textbf{Week 5:} Implementing the "Find Partner" filtering logic and UI.
+        \item \textbf{Week 6:} Final integration, bug fixing, responsive design tweaks, and project documentation.
+    \end{itemize}
+\end{frame}
+
+% Slide 6: Status of Work Done
+\begin{frame}{Status of Work Done}
+    \textbf{Completed Milestones:}
+    \begin{itemize}
+        \item \checkmark Initialized frontend (React/Vite) and backend (Node/Express) environments.
+        \item \checkmark Designed and deployed MongoDB database schemas.
+        \item \checkmark \textbf{User Authentication is fully implemented} (Registration, Login, secure token handling).
+    \end{itemize}
+    \vspace{0.5cm}
+    \textbf{Currently Working On / Next Steps:}
+    \begin{itemize}
+        \item \textbf{In Progress:} Porting and adapting the Posts feed and Profile page UI.
+        \item \textbf{Upcoming:} Finalizing the "Find Partner" matching interface and ensuring smooth navigation between the three core tabs.
+    \end{itemize}
+\end{frame}
+
+% Slide 7: Thank You
+\begin{frame}
+    \begin{center}
+        \Huge \textbf{Thank You!} \\ \vspace{0.5cm}
+    \end{center}
+\end{frame}
+
+\end{document}
