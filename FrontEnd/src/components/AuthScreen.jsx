@@ -1,14 +1,12 @@
 import React, { useState } from 'react';
-import { DOMAINS, LEARNING_STYLES, STUDY_TIMES, TEAM_PREFERENCES, AVATAR_OPTIONS, getAvatarUrl } from '../constants.js';
+import { DOMAINS, LEARNING_STYLES, STUDY_TIMES, TEAM_PREFERENCES, AVATAR_OPTIONS, getAvatarUrl } from '../../constants.js';
 import { apiLogin, apiRegister } from '../services/apiService.js';
 
-// --- VALIDATION RULES ---
 const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
 const passwordErrorMsg =
   'Password must be 8+ chars with at least one uppercase, one lowercase, and one number.';
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const emailErrorMsg = 'Please enter a valid email address.';
-// --- END RULES ---
 
 
 const SunIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>;
@@ -42,25 +40,21 @@ const AuthScreen = ({ onLoginSuccess, theme, toggleTheme }) => {
 
     try {
       if (isLoginView) {
-        // --- LOGIN LOGIC ---
         if (!formData.email) {
             setError("Please enter your email.");
             setIsLoading(false);
             return;
         }
-        // --- FIXED: Pass formData.email to apiLogin ---
         const userData = await apiLogin(formData.email, formData.password);
-        onLoginSuccess(userData); // Pass real user data up to App.jsx
+        onLoginSuccess(userData); 
 
       } else {
-        // --- SIGNUP LOGIC ---
         if (step === 2) {
           const userData = await apiRegister(formData);
-          onLoginSuccess(userData); // Pass real user data up to App.jsx
+          onLoginSuccess(userData); 
         }
       }
     } catch (err) {
-      // If apiFetch throws an error, we catch it here
       setError(err.message);
       setIsLoading(false);
     }
@@ -69,31 +63,24 @@ const AuthScreen = ({ onLoginSuccess, theme, toggleTheme }) => {
   const handleViewToggle = (isLogin) => {
     setIsLoginView(isLogin);
     setStep(1); 
-    setError(null); // Clear errors on view toggle
+    setError(null); 
   };
 
-  // --- FIXED: All validation is inside this function ---
   const nextStep = () => {
-    // 1. Check for empty fields
     if (!formData.name || !formData.email || !formData.username || !formData.password) {
         setError("Please fill out all account fields.");
         return;
     }
-
-    // 2. Check email format
     if (!emailRegex.test(formData.email)) {
       setError(emailErrorMsg);
       return;
     }
-
-    // 3. Check password strength
     if (!passwordRegex.test(formData.password)) {
       setError(passwordErrorMsg);
-      return; // Stop the user from proceeding
+      return; 
     }
-    
-    // 4. All checks passed
-    setError(null);
+  
+      setError(null);
     setStep(prev => prev + 1);
   }
   
@@ -157,7 +144,7 @@ const AuthScreen = ({ onLoginSuccess, theme, toggleTheme }) => {
               <label htmlFor="email" className={formLabelClass}>Email</label>
               <input 
                 type="email" 
-                name="email" // --- FIXED: Always 'email' ---
+                name="email"
                 id="email" 
                 onChange={handleInputChange} 
                 className={formInputClass} 
@@ -166,7 +153,6 @@ const AuthScreen = ({ onLoginSuccess, theme, toggleTheme }) => {
               />
             </div>
             
-            {/* Show Username field only on signup step 1 */}
             {!isLoginView && step === 1 && (
                <div>
                   <label htmlFor="username-signup" className={formLabelClass}>Username</label>

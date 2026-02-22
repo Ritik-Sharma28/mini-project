@@ -1,13 +1,10 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import AuthScreen from './components/AuthScreen.jsx';
-import MainAppScreen from './components/MainAppScreen.jsx';
-import DmScreen from './components/DmScreen.jsx';
-import { DEFAULT_USER } from './constants.js'; // We still need this for the *old* App.jsx file
+import AuthScreen from './src/components/AuthScreen.jsx';
+import ComingSoon from './src/components/ComingSoon.jsx';
 
 const App = () => {
   const [currentView, setCurrentView] = useState('auth');
   const [loggedInUser, setLoggedInUser] = useState(null);
-  const [chattingWith, setChattingWith] = useState(null);
   const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'light');
 
   useEffect(() => {
@@ -22,32 +19,22 @@ const App = () => {
 
   const toggleTheme = () => setTheme(prevTheme => (prevTheme === 'light' ? 'dark' : 'light'));
   
-  // --- MODIFIED THIS FUNCTION ---
-  // It no longer needs to check for 'DemoUser'
   const handleLoginSuccess = useCallback((userData) => {
-    setLoggedInUser(userData); // Just set the user data from the API
-    setCurrentView('main');
+    setLoggedInUser(userData);
+    setCurrentView('coming-soon');
   }, []);
-  // --- END MODIFICATION ---
+
 
   const handleLogout = useCallback(() => {
     setLoggedInUser(null);
     setCurrentView('auth');
-    // We should also call a logout API endpoint here
-    // but we can add that later.
   }, []);
-
-  const handleStartChat = useCallback((user) => { setChattingWith(user); setCurrentView('dm'); }, []);
-  const handleGoBack = useCallback(() => { setCurrentView('main'); setChattingWith(null); }, []);
 
   const renderView = () => {
     switch (currentView) {
-      case 'main': return <MainAppScreen user={loggedInUser} onStartChat={handleStartChat} onLogout={handleLogout} theme={theme} toggleTheme={toggleTheme} />;
-      case 'dm': return <DmScreen user={chattingWith} onGoBack={handleGoBack} />;
+      case 'coming-soon': return <ComingSoon />;
       case 'auth': default: 
-        /* --- MODIFIED THIS LINE --- */
         return <AuthScreen onLoginSuccess={handleLoginSuccess} theme={theme} toggleTheme={toggleTheme} />;
-        /* --- END MODIFICATION --- */
     }
   };
 
