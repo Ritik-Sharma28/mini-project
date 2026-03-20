@@ -1,0 +1,69 @@
+import { io } from 'socket.io-client';
+
+let socket;
+
+// Determine URL based on environment
+const URL = import.meta.env.VITE_API_BASE_URL === '/api'
+  ? undefined
+  : import.meta.env.VITE_API_BASE_URL;
+
+export const connectSocket = () => {
+  const token = localStorage.getItem('token');
+
+  if (!socket && token) {
+    socket = io(URL, {
+      auth: { token }, // Pass token in auth object for Socket.IO middleware
+      // withCredentials: true, // Not needed for header-based auth
+    });
+
+    socket.on('connect', () => {
+      console.log('Socket connected:', socket.id);
+    });
+
+    socket.on('disconnect', () => {
+      console.log('Socket disconnected');
+    });
+
+    socket.on('connect_error', (err) => {
+      console.error('Socket connection error:', err.message);
+    });
+  }
+};
+
+export const disconnectSocket = () => {
+  if (socket) {
+    socket.disconnect();
+    socket = null;
+  }
+};
+
+// --- Emitters ---
+
+export const joinRoom = (roomId) => {
+  if (socket) socket.emit('joinRoom', roomId);
+};
+
+export const leaveRoom = (roomId) => {
+  if (socket) socket.emit('leaveRoom', roomId);
+};
+
+// --- FIX IS HERE: Pass 'isGroup' to the server ---
+export const sendMessage = (roomId, message, isGroup = false) => {
+  if (socket) {
+    // The backend expects: { roomId, message, isGroup }
+    socket.emit('sendMessage', { roomId, message, isGroup });
+  }
+};
+
+export const onMessageReceived = (callback) => {
+  if (socket) {
+    socket.removeAllListeners('receiveMessage');
+    socket.on('receiveMessage', callback);
+  }
+};
+
+export const offMessageReceived = () => {
+  if (socket) {
+    socket.removeAllListeners('receiveMessage');
+  }
+};
