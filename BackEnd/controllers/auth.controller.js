@@ -1,7 +1,7 @@
 import User from '../models/User.model.js';
 import jwt from 'jsonwebtoken';
 
-// Generate JWT Helper
+// Generate Json Web Token (JWT) Helper to send data btw client and server
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: '30d',
@@ -81,7 +81,7 @@ export const registerUser = async (req, res) => {
   }
 };
 
-// --- Login User ---
+// ---- Login User ----
 // POST /api/auth/login
 export const loginUser = async (req, res) => {
   try {
@@ -95,7 +95,7 @@ export const loginUser = async (req, res) => {
     // Find user
     const user = await User.findOne({ email });
 
-    // Check password
+    // Check password from user 
     if (user && (await user.matchPassword(password))) {
       const token = generateToken(user._id);
 
@@ -105,7 +105,7 @@ export const loginUser = async (req, res) => {
         email: user.email,
         username: user.username,
         avatarId: user.avatarId,
-        token: token, // <--- Return token directly
+        token: token, // <---It return token directly
 
         domains: user.domains,
         learningStyle: user.learningStyle,
@@ -134,3 +134,452 @@ export const logoutUser = (req, res) => {
   });
   res.status(200).json({ message: 'Logged out successfully' });
 };
+// logged out succesfully
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+// logged out succesfully
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
