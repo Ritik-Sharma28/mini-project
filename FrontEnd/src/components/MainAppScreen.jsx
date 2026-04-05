@@ -14,7 +14,7 @@ import PostsView from './views/PostsView.jsx';
 import FindPartnerView from './views/FindPartnerView.jsx';
 import ProfileView from './views/ProfileView.jsx';
 
-// --- Character Limits ---
+
 const TITLE_MAX_LENGTH = 100;
 const SUMMARY_MAX_LENGTH = 280;
 const CONTENT_MAX_LENGTH = 5000;
@@ -22,27 +22,34 @@ const TAGS_MAX_LENGTH = 100;
 
 const MainAppScreen = ({ user, onStartChat, onLogout, theme, toggleTheme, onProfileUpdate, onShowChats, onViewProfile }) => {
   const [activeTab, setActiveTab] = useState('posts');
-  
-  // --- NEW: State to handle auto-opening a group from Chat List ---
+  const [renderedTabs, setRenderedTabs] = useState({ posts: true });
+
+  useEffect(() => {
+    if (!renderedTabs[activeTab]) {
+      setRenderedTabs(prev => ({ ...prev, [activeTab]: true }));
+    }
+  }, [activeTab]);
+
+
   const [autoOpenGroupId, setAutoOpenGroupId] = useState(null);
 
-  // State for Modals
+
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
   const [isPostModalOpen, setIsPostModalOpen] = useState(false);
-  
-  // State for Post Modal (Create/Edit)
+
+
   const [postToEdit, setPostToEdit] = useState(null);
   const [postModalData, setPostModalData] = useState({ title: '', summary: '', content: '', tags: '' });
-  
-  // State for Posts Feed
+
+
   const [posts, setPosts] = useState([]);
   const [isLoadingPosts, setIsLoadingPosts] = useState(true);
   const [postsError, setPostsError] = useState(null);
 
-  // State for Toast Notification
+
   const [toastMessage, setToastMessage] = useState('');
 
-  // Effect to clear toast
+
   useEffect(() => {
     if (toastMessage) {
       const timer = setTimeout(() => { setToastMessage(''); }, 3000);
@@ -50,13 +57,20 @@ const MainAppScreen = ({ user, onStartChat, onLogout, theme, toggleTheme, onProf
     }
   }, [toastMessage]);
 
-  // Fetch Recommended Posts
+
   useEffect(() => {
     if (user && user._id) {
       setIsLoadingPosts(true);
       apiGetRecommendedPosts(user._id)
         .then(fetchedPosts => {
-          setPosts(fetchedPosts);
+
+          if (Array.isArray(fetchedPosts)) {
+            setPosts(fetchedPosts);
+          } else {
+            console.error("API Error: Received invalid data", fetchedPosts);
+            setPosts([]);
+          }
+
           setPostsError(null);
         })
         .catch(err => {
@@ -68,7 +82,7 @@ const MainAppScreen = ({ user, onStartChat, onLogout, theme, toggleTheme, onProf
     }
   }, [user]);
 
-  // --- Handlers ---
+
   const openLogoutModal = () => setIsLogoutModalOpen(true);
   const closeLogoutModal = () => setIsLogoutModalOpen(false);
   const confirmLogout = () => {
@@ -76,23 +90,23 @@ const MainAppScreen = ({ user, onStartChat, onLogout, theme, toggleTheme, onProf
     onLogout();
   };
 
-  // --- NEW: Internal Handler for "Start Chat" ---
-  // This handles both DMs (passed to parent) and Groups (handled internally)
+
+
   const handleStartChatInternal = (target, type = 'dm') => {
     if (type === 'group') {
-      // 1. Switch to Community Tab
+
       setActiveTab('community');
-      // 2. Set the ID so CommunityView opens it immediately
+
       setAutoOpenGroupId(target._id);
-      // 3. Close the Chat List Overlay (if open in App.jsx)
-      if (onShowChats) onShowChats(); // Toggles it off
+
+      if (onShowChats) onShowChats();
     } else {
-      // For DMs, bubble up to App.jsx to open DmScreen
+
       if (onStartChat) onStartChat(target);
     }
   };
 
-  // --- Post Modal Handlers (Create & Edit) ---
+
   const handleOpenPostModal = (post = null) => {
     if (post && post._id) {
       setPostToEdit(post);
@@ -117,7 +131,7 @@ const MainAppScreen = ({ user, onStartChat, onLogout, theme, toggleTheme, onProf
 
   const handlePostInputChange = (e) => {
     const { name, value } = e.target;
-    // Enforce limits
+
     if (name === 'title' && value.length > TITLE_MAX_LENGTH) return;
     if (name === 'summary' && value.length > SUMMARY_MAX_LENGTH) return;
     if (name === 'content' && value.length > CONTENT_MAX_LENGTH) return;
@@ -152,7 +166,7 @@ const MainAppScreen = ({ user, onStartChat, onLogout, theme, toggleTheme, onProf
     }
   };
 
-  // --- Like Handler (Optimistic) ---
+
   const handleLikePost = async (postId) => {
     const currentPost = posts.find(p => p._id === postId);
     if (!currentPost) return;
@@ -174,8 +188,8 @@ const MainAppScreen = ({ user, onStartChat, onLogout, theme, toggleTheme, onProf
       setPosts(originalPosts);
     }
   };
-  
-  // --- Profile Update Handler ---
+
+
   const handleProfileUpdateSubmit = async (profileData) => {
     try {
       const updatedUser = await apiUpdateUserProfile(profileData);
@@ -186,74 +200,78 @@ const MainAppScreen = ({ user, onStartChat, onLogout, theme, toggleTheme, onProf
     }
   };
 
-  // --- Render Logic ---
+
   const tabTitle = activeTab === 'findPartner' ? 'Find Partner' : activeTab;
 
-  const renderContent = () => {
-    switch (activeTab) {
-      case 'posts': 
-        return <PostsView 
-                  onOpenPostModal={handleOpenPostModal}
-                  posts={posts}
-                  isLoading={isLoadingPosts}
-                  error={postsError} 
-                  user={user}
-                  onLikePost={handleLikePost}
-                  setToastMessage={setToastMessage}
-                  onViewProfile={onViewProfile}
-                />;
-      case 'findPartner': 
-        return <FindPartnerView 
-                  onStartChat={(u) => handleStartChatInternal(u, 'dm')} 
-                  onViewProfile={onViewProfile}
-                  user={user}
-                />;
-      case 'profile': 
-        return <ProfileView 
-                  user={user} 
-                  onLogout={openLogoutModal}
-                  onProfileUpdate={handleProfileUpdateSubmit}
-                  onOpenPostModal={handleOpenPostModal}
-                />;
-      case 'community': 
-        return <CommunityView 
-                  onStartChat={(u) => handleStartChatInternal(u, 'dm')} 
-                  onViewProfile={onViewProfile}
-                  user={user}
-                  // --- NEW PROPS for navigation ---
-                  initialGroupId={autoOpenGroupId}
-                  onGroupOpened={() => setAutoOpenGroupId(null)}
-                />;
-      default: 
-        return <CommunityView 
-                  onStartChat={(u) => handleStartChatInternal(u, 'dm')} 
-                  onViewProfile={onViewProfile}
-                  user={user}
-                />;
-    }
-  };
+  // Moved rendering logic to return statement for persistence
 
   return (
     <div className="flex-1 flex flex-col h-full bg-gray-100 dark:bg-gray-900">
-      <AppHeader 
-        title={tabTitle} 
-        theme={theme} 
-        toggleTheme={toggleTheme} 
+      <AppHeader
+        title={tabTitle}
+        theme={theme}
+        toggleTheme={toggleTheme}
         onShowChats={onShowChats}
         onViewProfile={onViewProfile}
         showSearch={activeTab === 'posts'}
       />
-      
-      <main className="flex-1 overflow-y-auto">
-        {renderContent()}
+
+      <main className="flex-1 overflow-y-auto relative p-0">
+        <div className={activeTab === 'posts' ? 'block h-full' : 'hidden'}>
+          {renderedTabs['posts'] && (
+            <PostsView
+              onOpenPostModal={handleOpenPostModal}
+              posts={posts}
+              isLoading={isLoadingPosts}
+              error={postsError}
+              user={user}
+              onLikePost={handleLikePost}
+              setToastMessage={setToastMessage}
+              onViewProfile={onViewProfile}
+            />
+          )}
+        </div>
+
+        <div className={activeTab === 'findPartner' ? 'block h-full' : 'hidden'}>
+          {renderedTabs['findPartner'] && (
+            <FindPartnerView
+              onStartChat={(u) => handleStartChatInternal(u, 'dm')}
+              onViewProfile={onViewProfile}
+              user={user}
+            />
+          )}
+        </div>
+
+        <div className={activeTab === 'community' ? 'block h-full' : 'hidden'}>
+          {renderedTabs['community'] && (
+            <CommunityView
+              onStartChat={(u) => handleStartChatInternal(u, 'dm')}
+              onViewProfile={onViewProfile}
+              user={user}
+              initialGroupId={autoOpenGroupId}
+              onGroupOpened={() => setAutoOpenGroupId(null)}
+            />
+          )}
+        </div>
+
+        <div className={activeTab === 'profile' ? 'block h-full' : 'hidden'}>
+          {renderedTabs['profile'] && (
+            <ProfileView
+              user={user}
+              onLogout={openLogoutModal}
+              onProfileUpdate={handleProfileUpdateSubmit}
+              onOpenPostModal={handleOpenPostModal}
+            />
+          )}
+        </div>
       </main>
-      
+
       <TabBar activeTab={activeTab} setActiveTab={setActiveTab} />
 
-      {/* New Post / Edit Post Modal */}
+      { }
       <Modal isOpen={isPostModalOpen} onClose={handleClosePostModal} title={postToEdit ? "Edit Your Post" : "Create a New Post"}>
         <form onSubmit={handlePostSubmit} className="space-y-4">
-          {/* Title */}
+          { }
           <div>
             <div className="flex justify-between items-center">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Title</label>
@@ -268,7 +286,7 @@ const MainAppScreen = ({ user, onStartChat, onLogout, theme, toggleTheme, onProf
               required
             />
           </div>
-          {/* Summary */}
+          { }
           <div>
             <div className="flex justify-between items-center">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Summary</label>
@@ -283,7 +301,7 @@ const MainAppScreen = ({ user, onStartChat, onLogout, theme, toggleTheme, onProf
               required
             />
           </div>
-          {/* Tags */}
+          { }
           <div>
             <div className="flex justify-between items-center">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Tags (comma-separated)</label>
@@ -298,7 +316,7 @@ const MainAppScreen = ({ user, onStartChat, onLogout, theme, toggleTheme, onProf
               placeholder="e.g. React, Web Dev, JavaScript"
             />
           </div>
-          {/* Content */}
+          { }
           <div>
             <div className="flex justify-between items-center">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Content (Markdown supported)</label>
@@ -313,7 +331,7 @@ const MainAppScreen = ({ user, onStartChat, onLogout, theme, toggleTheme, onProf
               required
             />
           </div>
-          {/* Submit */}
+          { }
           <div className="flex justify-end pt-4">
             <button
               type="submit"
@@ -325,7 +343,7 @@ const MainAppScreen = ({ user, onStartChat, onLogout, theme, toggleTheme, onProf
         </form>
       </Modal>
 
-      {/* Logout Confirmation Modal */}
+      { }
       <Modal isOpen={isLogoutModalOpen} onClose={closeLogoutModal} title="Confirm Logout">
         <div className="space-y-6">
           <p className="text-gray-700 dark:text-gray-300">Are you sure you want to log out?</p>
@@ -340,7 +358,7 @@ const MainAppScreen = ({ user, onStartChat, onLogout, theme, toggleTheme, onProf
         </div>
       </Modal>
 
-      {/* Toast Notification */}
+      { }
       {toastMessage && (
         <div className="fixed bottom-20 left-1/2 -translate-x-1/2 bg-gray-800 dark:bg-gray-200 text-white dark:text-gray-900 py-3 px-6 rounded-full shadow-lg animate-fadeIn z-50">
           <p className="font-medium">{toastMessage}</p>

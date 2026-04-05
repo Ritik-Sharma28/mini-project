@@ -1,33 +1,11 @@
 import axios from 'axios';
 
-// --- 1. CREATE A NEW AXIOS INSTANCE ---
-// This reads the VITE_API_BASE_URL from your .env file
+
+
 const apiClient = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
-  // withCredentials: true, // REMOVED: No longer using cookies
+  withCredentials: true,
 });
-
-// --- INTERCEPTOR: Add Token to Headers ---
-apiClient.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
-
-// --- ERROR HANDLING (Global) ---
-apiClient.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    const message = error.response?.data?.message || error.message;
-    console.error("API Error:", message);
-    return Promise.reject(new Error(message));
-  }
-);
 
 
 export const apiSearchUsers = async (query) => {
@@ -35,64 +13,81 @@ export const apiSearchUsers = async (query) => {
   return data;
 };
 
-// --- Auth Functions ---
+
 export const apiLogin = async (email, password) => {
+
   const { data } = await apiClient.post('/auth/login', { email, password });
-  // SAVE TOKEN
-  if (data.token) {
-    localStorage.setItem('token', data.token);
-  }
   return data;
 };
 
 export const apiRegister = async (formData) => {
+
   const { data } = await apiClient.post('/auth/register', formData);
-  // SAVE TOKEN
-  if (data.token) {
-    localStorage.setItem('token', data.token);
-  }
   return data;
 };
 
-export const apiLogout = async () => {
-  // Clear token locally
-  localStorage.removeItem('token');
-  // Optional: Notify backend (though strictly not needed for stateless JWT)
-  try {
-    const { data } = await apiClient.post('/auth/logout');
-    return data;
-  } catch (e) {
-    return { message: "Logged out locally" };
-  }
-};
-
-// --- USER FUNCTIONS ---
-// New helper to get current profile
-export const apiGetUserProfile = async () => {
-  const { data } = await apiClient.get('/users/profile');
+export const apiForgotPassword = async (email) => {
+  const { data } = await apiClient.post('/auth/forgotpassword', { email });
   return data;
 };
 
-export const apiUpdateUserProfile = async (profileData) => {
-  const { data } = await apiClient.put('/users/profile', profileData);
+export const apiResetPassword = async (token, password) => {
+  const { data } = await apiClient.put(`/auth/resetpassword/${token}`, { password });
   return data;
 };
 
-export const apiGetUserById = async (userId) => {
-  const { data } = await apiClient.get(`/users/${userId}`);
+
+
+
+export const apiGetComments = async (postId) => {
+  const { data } = await apiClient.get(`/comments/${postId}`);
   return data;
 };
 
-// --- POST FUNCTIONS ---
+export const apiAddComment = async (postId, content, parentCommentId = null) => {
+  const { data } = await apiClient.post(`/comments/${postId}`, { content, parentCommentId });
+  return data;
+};
+
+export const apiDeleteComment = async (commentId) => {
+  const { data } = await apiClient.delete(`/comments/${commentId}`);
+  return data;
+};
+
 
 export const apiGetRecommendedPosts = async (userId) => {
+
   const { data } = await apiClient.get(`/v1/posts/recommend-posts`, {
     params: { user_id: userId }
   });
   return data.recommended;
 };
 
+
+export const apiFindPartners = async (userId, filters) => {
+
+  const params = new URLSearchParams();
+  params.append('user_id', userId);
+
+
+  if (filters.skills && filters.skills.length > 0) {
+    filters.skills.forEach(skill => params.append('domain', skill));
+  }
+  if (filters.studyTime && filters.studyTime.length > 0) {
+    filters.studyTime.forEach(time => params.append('study_time', time.toLowerCase()));
+  }
+  if (filters.teamPref) {
+    params.append('team_pref', filters.teamPref.toLowerCase());
+  }
+
+
+  const { data } = await apiClient.get(`/v1/partners/find-partner`, { params });
+  return data.matches;
+};
+
+
 export const apiCreatePost = async (postData) => {
+
   const { data } = await apiClient.post('/posts', postData);
   return data;
 };
@@ -101,6 +96,34 @@ export const apiLikePost = async (postId) => {
   const { data } = await apiClient.put(`/posts/${postId}/like`);
   return data;
 };
+
+
+
+export const getMyPosts = async (req, res) => {
+  try {
+    const posts = await Post.find({ author: req.user._id })
+      .populate('author', 'name avatarId')
+      .sort({ createdAt: -1 });
+    res.json(posts);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+
+
+export const apiUpdateUserProfile = async (profileData) => {
+  const { data } = await apiClient.put('/users/profile', profileData);
+  return data;
+};
+
+export const apiGetProfile = async () => {
+  const { data } = await apiClient.get('/users/profile');
+  return data;
+};
+
+
 
 export const apiGetMyPosts = async () => {
   const { data } = await apiClient.get('/posts/myposts');
@@ -117,34 +140,18 @@ export const apiDeletePost = async (postId) => {
   return data;
 };
 
-export const apiGetPostsByUserId = async (userId) => {
-  const { data } = await apiClient.get(`/posts/user/${userId}`);
+
+
+export const apiGetUserById = async (userId) => {
+  const { data } = await apiClient.get(`/users/${userId}`);
   return data;
 };
 
 
-// --- PARTNER FUNCTIONS ---
-
-export const apiFindPartners = async (userId, filters) => {
-  const params = new URLSearchParams();
-  params.append('user_id', userId);
-
-  if (filters.skills && filters.skills.length > 0) {
-    filters.skills.forEach(skill => params.append('domain', skill));
-  }
-  if (filters.studyTime && filters.studyTime.length > 0) {
-    filters.studyTime.forEach(time => params.append('study_time', time.toLowerCase()));
-  }
-  if (filters.teamPref) {
-    params.append('team_pref', filters.teamPref.toLowerCase());
-  }
-
-  const { data } = await apiClient.get(`/v1/partners/find-partner`, { params });
-  return data.matches;
+export const apiGetPostsByUserId = async (userId) => {
+  const { data } = await apiClient.get(`/posts/user/${userId}`);
+  return data;
 };
-
-
-// --- MESSAGE FUNCTIONS ---
 
 export const apiGetDmMessages = async (roomId) => {
   const { data } = await apiClient.get(`/messages/dm/${roomId}`);
@@ -162,7 +169,9 @@ export const apiGetMyChats = async () => {
 };
 
 
-// --- GROUP FUNCTIONS ---
+
+
+
 
 export const apiGetAllGroups = async () => {
   const { data } = await apiClient.get('/groups');
@@ -189,8 +198,28 @@ export const apiGetGroupMembers = async (groupId) => {
   return data;
 };
 
+
 export const apiSeedGroups = async () => {
   const { data } = await apiClient.post('/groups/seed');
   return data;
 };
 
+
+export const apiLogout = async () => {
+  const { data } = await apiClient.post('/auth/logout');
+  return data;
+};
+
+
+
+
+
+apiClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+
+    const message = error.response?.data?.message || error.message;
+    console.error("API Error:", message);
+    return Promise.reject(new Error(message));
+  }
+);

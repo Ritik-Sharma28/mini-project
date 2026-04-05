@@ -3,50 +3,61 @@ import AuthScreen from './components/AuthScreen.jsx';
 import MainAppScreen from './components/MainAppScreen.jsx';
 import DmScreen from './components/DmScreen.jsx';
 import ChatListView from './components/views/ChatListView.jsx';
-import UserProfileView from './components/views/UserProfileView.jsx';// 1. Import new view
-import { DEFAULT_USER } from './constants.js';
+import UserProfileView from './components/views/UserProfileView.jsx';
+import ForgotPasswordView from './components/views/ForgotPasswordView.jsx';
+import ResetPasswordView from './components/views/ResetPasswordView.jsx';
 import { connectSocket, disconnectSocket } from './services/socketService.js';
-import { apiLogout } from './services/apiService.js';
+import { apiLogout, apiGetProfile } from './services/apiService.js';
+import LoadingScreen from './components/LoadingScreen.jsx';
 
 const App = () => {
-  // 2. Add 'chatList' to the view states
+
   const [currentView, setCurrentView] = useState('auth');
   const [loggedInUser, setLoggedInUser] = useState(null);
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const [chattingWith, setChattingWith] = useState(null);
   const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'light');
-  // 2. New state for which profile we are viewing
+
   const [viewingProfileId, setViewingProfileId] = useState(null);
 
-  // --- 2. Manage Socket Connection Lifecycle & Auth Restore ---
-  useEffect(() => {
-    // 1. Check if we have a token (Auto-Login)
-    const token = localStorage.getItem('token');
-    if (token && !loggedInUser) {
-      // Fetch user profile
-      // We need to import apiGetUserProfile dynamically or logic structure might need a shift, 
-      // but for simplicity, let's assume we can fetch it.
-      // Actually, let's just use the api service function.
-      import('./services/apiService.js').then(({ apiGetUserProfile }) => {
-        apiGetUserProfile()
-          .then(user => {
-            setLoggedInUser(user);
-            setCurrentView('main');
-          })
-          .catch(() => {
-            // Token invalid
-            localStorage.removeItem('token');
-          });
-      });
-    }
+  const [resetToken, setResetToken] = useState(null);
 
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const user = await apiGetProfile();
+        setLoggedInUser(user);
+        setCurrentView('main');
+      } catch (err) {
+        console.log("Not logged in or session expired");
+      } finally {
+        setIsCheckingAuth(false);
+      }
+    };
+    checkAuth();
+  }, []);
+
+  useEffect(() => {
+    const path = window.location.pathname;
+    if (path.startsWith('/resetpassword/')) {
+      const token = path.split('/')[2];
+      if (token) {
+        setResetToken(token);
+        setCurrentView('resetPassword');
+      }
+    }
+  }, []);
+
+
+  useEffect(() => {
     if (loggedInUser) {
-      connectSocket(); // Connect when user logs in
+      connectSocket();
     }
     return () => {
-      disconnectSocket(); // Disconnect on cleanup (e.g., logout)
+      disconnectSocket();
     };
   }, [loggedInUser]);
-  // --- END ---
+
 
   useEffect(() => {
     if (theme === 'dark') {
@@ -65,19 +76,20 @@ const App = () => {
     setCurrentView('main');
   }, []);
 
-  // --- 2. UPDATE handleLogout ---
+
   const handleLogout = useCallback(async () => {
     try {
-      await apiLogout(); // Call the backend (optional) and clear local token
+      await apiLogout();
     } catch (err) {
       console.error("Logout failed:", err);
     } finally {
+
       setLoggedInUser(null);
       setCurrentView('auth');
       disconnectSocket();
     }
   }, []);
-  // --- END UPDATE ---
+
 
   const handleProfileUpdate = (newUserData) => {
     setLoggedInUser(newUserData);
@@ -92,28 +104,28 @@ const App = () => {
   }, []);
 
   const handleViewProfile = useCallback((userId) => {
-    setViewingProfileId(userId); // Set the ID to view
-    setCurrentView('userProfile'); // Change the page
+    setViewingProfileId(userId);
+    setCurrentView('userProfile');
   }, []);
 
   const handleGoBackFromDm = useCallback(() => {
-    // If we entered DM from a profile, go back to profile
-    if (viewingProfileId) { // Check ID
+
+    if (viewingProfileId) {
       setCurrentView('userProfile');
     } else {
       setCurrentView('chatList');
     }
-  }, [viewingProfileId]); // Depend on ID
+  }, [viewingProfileId]);
 
   const handleGoBackFromChats = useCallback(() => {
     setCurrentView('main');
   }, []);
-  // --- FIX: Clear the ID ---
+
   const handleGoBackFromProfile = useCallback(() => {
     setCurrentView('main');
-    setViewingProfileId(null); // Clear the ID
+    setViewingProfileId(null);
   }, []);
-  // --- END NAVIGATION ---
+
 
   const renderView = () => {
     switch (currentView) {
@@ -125,15 +137,15 @@ const App = () => {
           theme={theme}
           toggleTheme={toggleTheme}
           onProfileUpdate={handleProfileUpdate}
-          onShowChats={handleShowChats} // 4. Pass handler down
+          onShowChats={handleShowChats}
           onViewProfile={handleViewProfile}
         />;
-      case 'chatList': // 5. Add new case
+      case 'chatList':
         return <ChatListView
           onStartChat={handleStartChat}
           onGoBack={handleGoBackFromChats}
         />;
-      // 5. New Case for User Profile
+
       case 'userProfile':
         return <UserProfileView
           userId={viewingProfileId}
@@ -147,15 +159,26 @@ const App = () => {
           currentUser={loggedInUser}
         />;
 
+      case 'forgotPassword':
+        return <ForgotPasswordView onGoBack={() => setCurrentView('auth')} />;
+
+      case 'resetPassword':
+        return <ResetPasswordView token={resetToken} onResetSuccess={() => setCurrentView('auth')} />;
+
       case 'auth':
       default:
         return <AuthScreen
           onLoginSuccess={handleLoginSuccess}
           theme={theme}
           toggleTheme={toggleTheme}
+          onForgotPassword={() => setCurrentView('forgotPassword')}
         />;
     }
   };
+
+  if (isCheckingAuth) {
+    return <LoadingScreen />;
+  }
 
   return (
     <div className="w-full h-full flex justify-center items-center p-0 md:p-4">
