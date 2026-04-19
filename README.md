@@ -118,5 +118,6 @@ Study_Mate/
 ```
 
 
-📄 License
-This project is licensed under the MIT License.
+## 📄 License
+
+This project is proprietary. All rights reserved by Web Crew (Ritik Sharma, Yash Kumar, Tavishi Jain). Unauthorized copying, modification, or distribution of this software is strictly prohibited.
