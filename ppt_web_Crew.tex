@@ -1,10 +1,18 @@
-\documentclass[11pt]{beamer}
+\documentclass[11pt, aspectratio=169]{beamer} % Widescreen 16:9 aspect ratio
 
 \usepackage{booktabs} 
+\usepackage{graphicx} % Essential for images
+\usepackage{lmodern}  % Crisp, modern typography
 
 \usetheme{Madrid}
-\definecolor{ModernBlue}{RGB}{41, 128, 185} 
+\definecolor{ModernBlue}{RGB}{41, 100, 185} 
 \usecolortheme[named=ModernBlue]{structure}
+
+% --- Aesthetic Improvements ---
+\setbeamertemplate{navigation symbols}{} % Removes clutter from bottom right
+\useinnertheme{circles} % Modern circular bullet points
+\setbeamerfont{frametitle}{series=\bfseries} % Bolder, cleaner slide titles
+\setbeamertemplate{blocks}[rounded][shadow=true] % Smooth shadows
 
 % Information for Title Slide
 \title[StudyMate (Mini-Project)]{StudyMate: A Developer Collaboration Platform}
@@ -28,7 +36,7 @@
     \begin{itemize}
         \item \textbf{Find Partner:} An algorithm to discover and connect with like-minded developers based on tech stacks.
         \item \textbf{Community Posts:} A dedicated feed to share project updates, ask technical questions, and showcase work.
-        \item \textbf{Developer Profiles:} Customizable profiles highlighting individual skills, GitHub links, and current focuses.
+        \item \textbf{Developer Profiles:} Customizable profiles highlighting individual skills and current focuses.
     \end{itemize}
 \end{frame}
 
@@ -37,13 +45,13 @@
     \begin{table}
         \centering
         \renewcommand{\arraystretch}{1.6} 
-        \begin{tabular}{@{} p{2.5cm} p{4cm} p{4cm} @{}}
+        \begin{tabular}{@{} p{2.5cm} p{5cm} p{5cm} @{}} % Slightly widened columns for 16:9
             \toprule
             \textbf{Feature} & \textbf{General Social Media} & \textbf{StudyMate (Our Project)} \\ 
             \midrule
-            \textbf{Primary Focus} & Broad networking, job hunting, or general discussions. & Strict focus on finding active project/coding partners. \\ 
-            \textbf{Matchmaking} & Manual searching and cold messaging. & Tech-stack specific filtering and matching. \\ 
-            \textbf{Distractions} & High (ads, viral posts, recruiters). & Low (strictly developer and project-centric content). \\ 
+            \textbf{Primary Focus} & Broad networking, job hunting. & Focus on finding project partners. \\ 
+            \textbf{Matchmaking} & Manual searching. & Tech-stack specific matching. \\ 
+            \textbf{Distractions} & High (ads, viral posts). & Low (strictly developer-centric). \\ 
             \bottomrule
         \end{tabular}
     \end{table}
@@ -56,40 +64,80 @@
     \begin{itemize}
         \item \textbf{Frontend:} React.js (built with Vite), Tailwind CSS for rapid UI styling.
         \item \textbf{Backend:} Node.js with Express.js for handling API routes and business logic.
-        \item \textbf{Database:} MongoDB (NoSQL) for flexible data storage of user profiles and posts.
+        \item \textbf{Database:} MongoDB (NoSQL) for flexible data storage.
         \item \textbf{Authentication:} JSON Web Tokens (JWT) for secure user sessions.
     \end{itemize}
 \end{frame}
 
-% Slide 5: Timeline of Project
-\begin{frame}{Timeline of Project (6 Weeks)}
+% --- START OF UI SCREENSHOTS ---
+
+% Slide 5: UI Showcase - Authentication
+\begin{frame}{User Interface: Secure Authentication}
+    \centering
+    \includegraphics[height=0.65\textheight, keepaspectratio]{image_ef5821.png} \\
+    \vspace{0.3cm}
     \begin{itemize}
-        \item \textbf{Week 1:} Requirement analysis, UI/UX wireframing, and repository setup.
-        \item \textbf{Week 2:} Backend architecture, database schema design, and implementing User Authentication.
-        \item \textbf{Week 3:} Developing the Frontend layout and integrating the Profile Page.
-        \item \textbf{Week 4:} Building the Community Posts feature (Create, Read, integration with backend).
-        \item \textbf{Week 5:} Implementing the "Find Partner" filtering logic and UI.
-        \item \textbf{Week 6:} Final integration, bug fixing, responsive design tweaks, and project documentation.
+        \item JWT-based secure login and signup system.
+        \item Responsive design for seamless access across devices.
     \end{itemize}
 \end{frame}
 
-% Slide 6: Project Status & Deployment
-\begin{frame}{Project Status \& Deployment}
-    \textbf{Completed Milestones:}
+% Slide 6: UI Showcase - Find Partner
+\begin{frame}{User Interface: Smart Partner Discovery}
+    \centering
+    \includegraphics[height=0.65\textheight, keepaspectratio]{image_ef57fd.png} \\
+    \vspace{0.3cm}
     \begin{itemize}
-        \item \checkmark Frontend (React/Vite) and Backend (Node/Express) fully integrated.
-        \item \checkmark User Authentication, Profile Pages, Post Section, Find Partner and Community 
-    \end{itemize}
-    \vspace{0.5cm}
-    \textbf{Project Deployment:}
-    \begin{itemize}
-        \item \textbf{Current Status:} \textbf{Fully Completed and Hosted}
-        \item \textbf{Infrastructure:} Microsoft Azure Cloud
-        \item \textbf{Live Application:} \url{http://4.186.31.157/}
+        \item Filter partners by \textbf{Stack} (React, Node, etc.) and \textbf{Time Preference}.
+        \item Direct connection matching for project collaboration.
     \end{itemize}
 \end{frame}
 
-% Slide 7: Thank You
+% Slide 7: UI Showcase - Community Groups
+\begin{frame}{User Interface: Interest-Based Groups}
+    \centering
+    \includegraphics[height=0.65\textheight, keepaspectratio]{image_ef57e0.jpg} \\
+    \vspace{0.3cm}
+    \begin{itemize}
+        \item Explore niche developer communities like \textbf{ML Enthusiasts} and \textbf{DSA Squad}.
+        \item Join groups to discuss specific tech-stack challenges.
+    \end{itemize}
+\end{frame}
+
+% Slide 8: UI Showcase - Post Feed
+\begin{frame}{User Interface: Real-time Discussion Feed}
+    \centering
+    \includegraphics[height=0.65\textheight, keepaspectratio]{image_ef581b.png} \\
+    \vspace{0.3cm}
+    \begin{itemize}
+        \item Active feed for sharing technical news and project updates.
+        \item Interactive "Like" and "Reply" features for developer engagement.
+    \end{itemize}
+\end{frame}
+
+% Slide 9: UI Showcase - Content Creation
+\begin{frame}{User Interface: Markdown Supported Posting}
+    \centering
+    \includegraphics[height=0.65\textheight, keepaspectratio]{image_ef57dd.png} \\
+    \vspace{0.3cm}
+    \begin{itemize}
+        \item Advanced post editor with \textbf{Markdown support} for code snippets.
+        \item Tagging system (\#Cloud, \#Outage) for better discoverability.
+    \end{itemize}
+\end{frame}
+
+% --- END OF UI SCREENSHOTS ---
+
+% Slide 10: Future Scope
+\begin{frame}{Future Scope \& Planned Features}
+    \begin{itemize}
+        \item \textbf{Real-Time Chat:} Implement Socket.io to allow direct, real-time messaging between matched partners.
+        \item \textbf{GitHub Integration:} Automatically fetch and display users' top repositories and recent commit activity on their profiles.
+        \item \textbf{AI Matchmaking:} Upgrade the matching algorithm using machine learning to suggest partners based on coding habits and past project success.
+    \end{itemize}
+\end{frame}
+
+% Slide 11: Thank You
 \begin{frame}
     \begin{center}
         \Huge \textbf{Thank You!} \\ \vspace{0.5cm}
