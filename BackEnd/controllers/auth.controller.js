@@ -28,8 +28,8 @@ const registerSchema = z.object({
 const setTokenCookie = (res, token) => {
   res.cookie('jwt', token, {
     httpOnly: true,
-   secure: true,      
-    sameSite: 'none',
+   secure: false,      
+      sameSite: 'lax', 
     maxAge: 1 * 24 * 60 * 60 * 1000,
   });
 };

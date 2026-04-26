@@ -18,12 +18,13 @@ import userRoutes from './routes/user.routes.js';
 import messageRoutes from './routes/message.routes.js';
 import groupRoutes from './routes/group.routes.js';
 import matchRoutes from './routes/match.routes.js';
+
 import commentRoutes from './routes/comment.routes.js';
 
 
 dotenv.config();
 const PORT = process.env.PORT || 5000;
-const FRONTEND_ORIGIN = process.env.FRONTEND_URL || 'https://localhost:5173';
+const FRONTEND_ORIGIN = 'http://4.186.31.157';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 
@@ -52,15 +53,26 @@ app.use('/api/comments', commentRoutes);
 app.use('/api/messages', messageRoutes);
 app.use('/api/groups', groupRoutes);
 
+app.use(express.static(path.join(__dirname, '../FrontEnd/dist')));
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../FrontEnd/dist/index.html'));
+});
 
 const startServer = async () => {
   try {
     await connectDB();
 
-    const io = new Server(server, { cors: corsOptions });
+    const io = new Server(server, {
+  cors: {
+    origin: "http://4.186.31.157",
+    methods: ["GET", "POST"],
+    credentials: true
+  }
+});
     initializeSocket(io);
 
-    server.listen(PORT, () =>
+    server.listen(PORT, '0.0.0.0', () =>
       console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`)
     );
   } catch (error) {

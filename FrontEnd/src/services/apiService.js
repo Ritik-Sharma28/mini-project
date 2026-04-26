@@ -3,7 +3,7 @@ import axios from 'axios';
 
 
 const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL,
+  baseURL: 'http://4.186.31.157:5000/api',
   withCredentials: true,
 });
 

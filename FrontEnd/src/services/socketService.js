@@ -4,18 +4,7 @@ let socket;
 
 
 const getSocketUrl = () => {
-  const url = import.meta.env.VITE_API_BASE_URL;
-
-  if (url === '/api') {
-    return undefined;
-  }
-
-  if (url && url.endsWith('/api')) {
-    return url.replace(/\/api$/, '');
-  }
-
-  
-  return url;
+  return "http://4.186.31.157";
 };
 
 export const connectSocket = () => {
